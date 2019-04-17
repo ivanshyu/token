@@ -1,0 +1,37 @@
+﻿let routes = [{
+	path: '/',
+	url: './index.html',
+}, {
+	path: '/sign/',
+	componentUrl: './pages/sign.html',
+}, {
+	path: '/signIn/',
+	componentUrl: './pages/signIn.html',
+}, {
+	path: '/signUp/',
+	componentUrl: './pages/signUp.html',
+}, {
+	path: '/keyInfo/',
+	componentUrl: './pages/keyInfo.html',
+}, {
+	path: '/keyManagement/',
+	componentUrl: './pages/keyManagement.html',
+}, {
+	path: '/transactionTest/',
+	componentUrl: './pages/transactionTest.html',
+}, {
+	path: '/transaction/',
+	componentUrl: './pages/transaction.html',
+}, {
+	path: '/createKey/',
+	componentUrl: './pages/createKey.html',
+}, {
+	path: '/setting/',
+	componentUrl: './pages/setting.html',
+}, {
+	path: '/waitVerify/',
+	componentUrl: './pages/waitVerify.html',
+}, {
+	path: '(.*)',
+	url: './pages/404.html',
+}]

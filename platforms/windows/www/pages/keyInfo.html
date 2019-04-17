@@ -1,0 +1,39 @@
+﻿<template>
+    <section class="page">
+        <nav class="navbar">
+            <div class="navbar-inner sliding">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="ios-only">Back</span>
+                    </a>
+                </div>
+                <div class="title">私鑰資訊</div>
+            </div>
+        </nav>
+        <div class="page-content">
+            <div class="block">
+                <pre><code id=info></code></pre>
+            </div>
+        </div>
+    </section>
+</template>
+
+<script>
+    return {
+        on: {
+            pageMounted: () => {
+                console.group('system')
+            },
+            pageBeforein: () => {
+                NativeStorage.getItem('encAccount', (encAccount) => {
+                    console.log(encAccount)
+                    $('#info').html(jsonPrettyPrint.toHtml(encAccount))
+                })
+            },
+            pageBeforeRemove: () => {
+                console.groupEnd()
+            },
+        },
+    }
+</script>

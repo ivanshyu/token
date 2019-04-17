@@ -1,0 +1,121 @@
+﻿<template>
+    <section class="page">
+        <nav class="navbar">
+            <div class="navbar-inner sliding">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="ios-only">Back</span>
+                    </a>
+                </div>
+                <div class="title">產生私鑰測試</div>
+            </div>
+        </nav>
+        <div class="page-content">
+            <form class="list inline-labels no-hairlines-md" id="createForm">
+                <ul>
+                    <li class="item-content item-input">
+                        <div class="item-inner">
+                            <div class="item-title item-label">password</div>
+                            <div class="item-input-wrap">
+                                <input type="text" name="password">
+                                <span class="input-clear-button"></span>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </form>
+
+            <div class="block">
+                <div class="row">
+                    <button class="col button button-fill" @click="start">開始測試</button>
+                </div>
+            </div>
+
+            <div class="block-title">效能</div>
+            <div class="list">
+                <ul>
+                    <li>
+                        <div class="item-content">
+                            <div class="item-inner">
+                                <div class="item-title">產生私鑰耗時</div>
+                                <div class="item-after" id="createTime"></div>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="item-content">
+                            <div class="item-inner">
+                                <div class="item-title">加密私鑰耗時</div>
+                                <div class="item-after" id="encryptTime"></div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="block-title">結果</div>
+            <div class="block">
+                <pre><code id="info1"></code></pre>
+            </div>
+            <div class="block">
+                <pre><code id="info2"></code></pre>
+            </div>
+        </div>
+    </section>
+</template>
+
+<script>
+
+    let start
+    let end
+
+    let createTime
+    let encryptTime
+
+    return {
+        methods: {
+            start: function () {
+
+                let decAccount
+                let encAccount
+                let data = app.form.convertToData('#createForm')
+
+                // 產生私鑰
+                start = new Date().getTime()
+                decAccount = web3.eth.accounts.create()
+                end = new Date().getTime()
+                createTime = end - start
+
+                // 加密私鑰
+                start = new Date().getTime()
+                encAccount = decAccount.encrypt(data.password)
+                end = new Date().getTime()
+                encryptTime = end - start
+
+                $('#createTime').text(createTime + '毫秒')
+                $('#encryptTime').text(encryptTime + '毫秒')
+
+                $('#info1').html(jsonPrettyPrint.toHtml(decAccount))
+                $('#info2').html(jsonPrettyPrint.toHtml(encAccount))
+
+                app.toast.create({
+                    icon: '<i class="material-icons">check_circle</i>',
+                    text: '測試成功',
+                    position: 'center',
+                    closeTimeout: 1000,
+                }).open()
+            },
+        },
+        on: {
+            pageMounted: () => {
+                console.group('system')
+            },
+            pageBeforein: () => {
+            },
+            pageBeforeRemove: () => {
+                console.groupEnd()
+            },
+        },
+    }
+</script>

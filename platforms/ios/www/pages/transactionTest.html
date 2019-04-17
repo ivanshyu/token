@@ -1,0 +1,203 @@
+<template>
+    <section class="page">
+        <nav class="navbar">
+            <div class="navbar-inner sliding">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="ios-only">Back</span>
+                    </a>
+                </div>
+                <div class="title">交易測試</div>
+            </div>
+        </nav>
+        <div class="page-content">
+            <form class="list inline-labels no-hairlines-md" id="tx_form">
+                <ul>
+                    <li class="item-content item-input">
+                        <div class="item-inner">
+                            <div class="item-title item-label">nonce</div>
+                            <div class="item-input-wrap">
+                                <input type="text" name="nonce">
+                                <span class="input-clear-button"></span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="item-content item-input">
+                        <div class="item-inner">
+                            <div class="item-title item-label">chainId</div>
+                            <div class="item-input-wrap">
+                                <input type="text" name="chainId">
+                                <span class="input-clear-button"></span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="item-content item-input">
+                        <div class="item-inner">
+                            <div class="item-title item-label">to</div>
+                            <div class="item-input-wrap">
+                                <input type="text" name="to">
+                                <span class="input-clear-button"></span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="item-content item-input">
+                        <div class="item-inner">
+                            <div class="item-title item-label">data</div>
+                            <div class="item-input-wrap">
+                                <input type="text" name="data">
+                                <span class="input-clear-button"></span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="item-content item-input">
+                        <div class="item-inner">
+                            <div class="item-title item-label">value</div>
+                            <div class="item-input-wrap">
+                                <input type="text" name="value">
+                                <span class="input-clear-button"></span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="item-content item-input">
+                        <div class="item-inner">
+                            <div class="item-title item-label">gasPrice</div>
+                            <div class="item-input-wrap">
+                                <input type="text" name="gasPrice">
+                                <span class="input-clear-button"></span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="item-content item-input">
+                        <div class="item-inner">
+                            <div class="item-title item-label">gas</div>
+                            <div class="item-input-wrap">
+                                <input type="text" name="gas">
+                                <span class="input-clear-button"></span>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </form>
+
+            <div class="block">
+                <div class="row">
+                    <button class="col button button-fill" @click="tx">開始測試</button>
+                    <button class="col button button-fill" @click="test">測試資料</button>
+                </div>
+            </div>
+
+            <div class="block-title">效能</div>
+            <div class="list">
+                <ul>
+                    <li>
+                        <div class="item-content">
+                            <div class="item-inner">
+                                <div class="item-title">私鑰讀取耗時</div>
+                                <div class="item-after" id="read"></div>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="item-content">
+                            <div class="item-inner">
+                                <div class="item-title">私鑰解密耗時</div>
+                                <div class="item-after" id="decrypt"></div>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="item-content">
+                            <div class="item-inner">
+                                <div class="item-title">簽署交易耗時</div>
+                                <div class="item-after" id="sign"></div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="block-title">結果</div>
+            <div class="block">
+                <pre><code id="info"></code></pre>
+            </div>
+        </div>
+    </section>
+</template>
+
+<script>
+
+    let start
+    let end
+
+    let readTime
+    let decryptTime
+    let signTime
+
+    return {
+        methods: {
+            tx: function () {
+                let tx = app.form.convertToData('#tx_form')
+
+                $('#read').empty()
+                $('#decrypt').empty()
+                $('#sign').empty()
+                $('#info').empty()
+
+                // 讀取
+                start = new Date().getTime()
+                NativeStorage.getItem('encAccount', (encAccount) => {
+                    end = new Date().getTime()
+                    readTime = end - start
+
+                    // 解密                    
+                    app.dialog.password('請輸入交易密碼', (password) => {
+                        start = new Date().getTime()
+                        let decAccount = web3.eth.accounts.decrypt(encAccount, password)
+                        end = new Date().getTime()
+                        decryptTime = end - start
+
+                        // 簽署
+                        start = new Date().getTime()
+                        decAccount.signTransaction(tx).then((signTx) => {
+                            end = new Date().getTime()
+                            let signTime = end - start
+
+                            $('#read').text(readTime + '毫秒')
+                            $('#decrypt').text(decryptTime + '毫秒')
+                            $('#sign').text(signTime + '毫秒')
+                            $('#info').html(jsonPrettyPrint.toHtml(signTx))
+
+                            app.toast.create({
+                                icon: '<i class="material-icons">check_circle</i>',
+                                text: '測試成功',
+                                position: 'center',
+                                closeTimeout: 1000,
+                            }).open()
+                        })
+                    })
+                })
+
+            },
+            test: function () {
+                $('input[name="nonce"]').val('0')
+                $('input[name="chainId"]').val('1')
+                $('input[name="to"]').val('0xF0109fC8DF283027b6285cc889F5aA624EaC1F55')
+                $('input[name="data"]').val()
+                $('input[name="value"]').val('1000000000')
+                $('input[name="gasPrice"]').val('234567897654321')
+                $('input[name="gas"]').val('2000000')
+            }
+        },
+        on: {
+            pageMounted: () => {
+                console.group('system')
+            },
+            pageBeforein: () => {
+            },
+            pageBeforeRemove: () => {
+                console.groupEnd()
+            },
+        },
+    }
+</script>

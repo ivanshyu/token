@@ -1,0 +1,122 @@
+﻿<template>
+    <section class="page">
+        <div class="page-content">
+            <h1>政大錢包</h1>
+            <form class="list no-hairlines-md" id="signIn_form">
+                <ul>
+                    <li class="item-content item-input">
+                        <div class="item-inner">
+                            <div class="item-title item-label">帳號(學號or員工代號)</div>
+                            <div class="item-input-wrap">
+                                <input id="ID" type="text" value="103703017" placeholder="Your student ID" autocomplete="username">
+                                <span class="input-clear-button"></span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="item-content item-input">
+                        <div class="item-inner">
+                            <div class="item-title item-label">密碼</div>
+                            <div class="item-input-wrap">
+                                <input id="password" type="password" value="841015" placeholder="Your password"
+                                    autocomplete="current-password">
+                                <span class="input-clear-button"></span>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </form>
+            <div class="block">
+                <div class="row">
+                    <button class="col button button-fill" @click="signIn">登入</button>
+                    <button class="col button button-fill" @click="signUp">註冊</button>
+                </div>
+            </div>
+        </div>
+    </section>
+</template>
+
+<script>
+    return {
+        data: function () {
+            return {
+                rememberID: storage.getItem('rememberID')
+            }
+        },
+        methods: {
+            signUp: () => {
+                app.router.navigate('/signUp/')
+            },
+            signIn: () => {
+                let ID = $('#ID').val()
+                let password = $('#password').val()
+                
+                api.signIn(ID, password, (data, status, xhr) => {
+                    //登入成功
+                    console.log("login")
+                    if (data.type) {
+
+                        Guser = data
+
+                        // 訊息提示
+                        app.toast.create({
+                            icon: '<i class="material-icons">check_circle</i>',
+                            text: data.inf,
+                            position: 'center',
+                            closeTimeout: 1000,
+                        }).open()
+
+                        // 記住帳號
+                        if ($('#remember').is(":checked")) {
+                            storage.setItem('rememberID', ID)
+                        } else {
+                            storage.removeItem('rememberID', ID)
+                        }
+
+                        // 跳轉頁面
+                        app.router.navigate('/', {
+                            clearPreviousHistory: true
+                        })
+                    }
+                    //登入失敗
+                    else {
+                        app.toast.create({
+                            icon: '<i class="material-icons">error</i>',
+                            text: data.inf,
+                            position: 'center',
+                            closeTimeout: 1000,
+                        }).open()
+                    }
+                    //伺服器錯誤
+                }, (xhr, status) => {
+                    console.error(xhr, status)
+                    app.toast.create({
+                        icon: '<i class="material-icons">error</i>',
+                        text: '伺服器錯誤',
+                        position: 'center',
+                        closeTimeout: 1000,
+                    }).open()
+                })
+            },
+        },
+        on: {
+            pageMounted: () => {
+                console.group('signIn')
+            },
+            pageInit: () => { },
+            pageBeforein: () => {
+            },
+            pageBeforeOut: () => { },
+            pageBeforeRemove: () => {
+                console.groupEnd()
+            },
+        },
+    }
+</script>
+
+<style>
+    h1 {
+        height: 15vh;
+        font-size: 4rem;
+        text-align: center;
+    }
+</style>
