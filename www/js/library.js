@@ -5,6 +5,7 @@ function toJSON(object) {
 function getUrl(path) {
     let server = app.data.server
     let url = `${server.protocol}://${server.ip}:${server.port}/${path}`
+    console.log(url)
     return url
 }
 
@@ -52,8 +53,9 @@ let myNativeStorage = {
 let library = {
     // 登入
     signIn: (user) => {
-        Guser = user
-
+        //console.log(123)
+        //console.log(user)
+        //Guser = user
         // 讀取設定
         NativeStorage.getItem('setting', (setting) => {
             Gsetting = setting
@@ -67,7 +69,8 @@ let library = {
     // 登出
     signOut() {
         clearData()
-        
+        myData = {}
+
         app.toast.create({
             icon: '<i class="material-icons">error</i>',
             text: '登出成功',
@@ -86,6 +89,31 @@ let library = {
             GdecAccount = null
         }
     },
+    init: (user) => {
+        myData.user = user
+
+        if (device.platform == 'android' || device.platform == 'ios') {
+            QRScanner.prepare(onDone)
+        }
+
+        api.getFriends((friends) => {
+            console.log('讀取朋友成功')
+            myData.friends = friends
+        })
+
+        api.getPoints((points) => {
+            console.log('讀取點數成功')
+            myData.points = points
+            myData.pointMap = new Map()
+            for (let i in points) {
+                myData.pointMap.set(points[i].address, points[i].name)
+            }
+        })
+
+        $('.profile_block img').attr('src', `imgs/${myData.user.ID}.jpg`)
+        $('.profile_block p').eq(0).text(myData.user.name)
+        $('.profile_block p').eq(1).text(myData.user.email)
+    }
 }
 
 // 彩色JSON

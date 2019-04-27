@@ -14,7 +14,8 @@ let api = {
 
     //user
     getUser: (ID, callback) => {
-        app.request.get(getUrl('user', { token: Guser.token, ID: ID }), (data, status, xhr) => {
+        console.log(Guser.token)
+        app.request.get(getUrl('user'), { token: Guser.token, ID: ID }, (data, status, xhr) => {
             console.log(status, data)
             callback(data)
         }, 'json')
@@ -35,5 +36,13 @@ let api = {
             },
             dataType: 'json',
         })
+    },
+    //nonce
+    getNonce: (callback) => {
+        app.request.get(getUrl('nonce'), { token: Guser.token }, (data, status, xhr) => {
+            console.log(status, data)
+            callback(data)
+        }, 'json')
     }
+    
 }

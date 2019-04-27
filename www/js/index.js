@@ -6,6 +6,8 @@ let Guser
 let Gsetting
 let GdecAccount
 
+let myData = {}
+
 document.addEventListener("deviceready", onDeviceReady, false)
 document.addEventListener("pause", onPause, false)
 document.addEventListener("resume", onResume, false)
