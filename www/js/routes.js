@@ -32,6 +32,9 @@ let routes = [{
 	path: '/waitVerify/',
 	componentUrl: './pages/waitVerify.html',
 }, {
+	path: '/listTrophy/',
+	componentUrl: './pages/listTrophy.html',
+}, {
 	path: '(.*)',
 	url: './pages/404.html',
 }]

@@ -12,7 +12,7 @@ let app = new Framework7({
 			server: {
 				name: 'NCCU server',
 				protocol: 'http',
-				ip: 'localhost',
+				ip: '140.119.163.46',
 				port: '50000',
 			},
 		};
